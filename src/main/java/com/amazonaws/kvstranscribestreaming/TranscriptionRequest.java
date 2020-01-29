@@ -29,7 +29,6 @@ public class TranscriptionRequest {
     String inputFileName = null;
     String startFragmentNum = null;
     String connectContactId = null;
-    String connectARN = null;           // Need connectARN to decide the s3 bucket and dynamoDB table
     Optional<String> languageCode = Optional.empty();
     boolean transcriptionEnabled = false;
     Optional<Boolean> saveCallRecording = Optional.empty();
@@ -74,14 +73,6 @@ public class TranscriptionRequest {
     public void setConnectContactId(String connectContactId) {
 
         this.connectContactId = connectContactId;
-    }
-
-    public String getConnectARN() {
-        return connectARN;
-    }
-
-    public void setConnectARN(String connectARN) {
-        this.connectARN = connectARN;
     }
 
     public Optional<String> getLanguageCode() {
@@ -137,30 +128,18 @@ public class TranscriptionRequest {
 
     public String toString() {
 
-        return String.format("streamARN=%s, startFragmentNum=%s, connectContactId=%s, languageCode=%s, " +
-                        "connectARN=%s, transcriptionEnabled=%s, saveCallRecording=%s, streamAudioFromCustomer=%s, " +
-                        "streamAudioToCustomer=%s",
-                getStreamARN(), getStartFragmentNum(), getConnectContactId(), getLanguageCode(),
-                getConnectARN(), isTranscriptionEnabled(), isSaveCallRecordingEnabled(), isStreamAudioFromCustomer(),
-                isStreamAudioToCustomer());
+        return String.format("streamARN=%s, startFragmentNum=%s, connectContactId=%s, languageCode=%s, transcriptionEnabled=%s, saveCallRecording=%s, streamAudioFromCustomer=%s, streamAudioToCustomer=%s",
+                getStreamARN(), getStartFragmentNum(), getConnectContactId(), getLanguageCode(), isTranscriptionEnabled(), isSaveCallRecordingEnabled(), isStreamAudioFromCustomer(), isStreamAudioToCustomer());
     }
 
     public void validate() throws IllegalArgumentException {
 
         // complain if both are provided
-        if ((getStreamARN() != null) && (getInputFileName() != null)) {
+        if ((getStreamARN() != null) && (getInputFileName() != null))
             throw new IllegalArgumentException("At most one of streamARN or inputFileName must be provided");
-        }
-
         // complain if none are provided
-        if ((getStreamARN() == null) && (getInputFileName() == null)) {
+        if ((getStreamARN() == null) && (getInputFileName() == null))
             throw new IllegalArgumentException("One of streamARN or inputFileName must be provided");
-        }
-
-        // complain if connectARN is not provided
-        if (getConnectARN() == null) {
-            throw new IllegalArgumentException("Connect Instance ARN must be provided");
-        }
 
         // language code is optional; if provided, it should be one of the values accepted by
         // https://docs.aws.amazon.com/transcribe/latest/dg/API_streaming_StartStreamTranscription.html#API_streaming_StartStreamTranscription_RequestParameters
